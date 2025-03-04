@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - DeadStock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="dashboard.html">
+                    <h2>DeadStock</h2>
+                </a>
+            </div>
+            <ul class="nav-list">
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">Master</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="create-item.html">Create Item</a></li>
+                        <li><a href="itemcode.html">Item Codes</a></li>
+                        <li><a href="category.html">Categories</a></li>
+                        <li><a href="department.html">Departments</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">Stock</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="stock-in.html">Stock In</a></li>
+                        <li><a href="stock-out.html">Stock Out</a></li>
+                        <li><a href="warehouse.html">Warehouse</a></li>
+                    </ul>
+                </li>
+                <li><a href="report.html" class="nav-link">Reports</a></li>
+                <li class="profile-menu dropdown">
+                    <a href="#" class="nav-link">
+                        <img id="navProfilePic" src="images/default-profile.png" alt="Profile" class="profile-pic-small">
+                        <span id="navProfileName">User Name</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="profile.html">View Profile</a></li>
+                        <li><a href="#" onclick="handleLogout()">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="card">
+            <h2>Generate Report</h2>
+            <form id="reportForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="reportType">Report Type</label>
+                        <select id="reportType" class="form-input" required>
+                            <option value="">Select report type...</option>
+                            <option value="inventory">Inventory Status</option>
+                            <option value="movement">Stock Movement</option>
+                            <option value="value">Inventory Value</option>
+                            <option value="lowstock">Low Stock</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="startDate">Start Date</label>
+                        <input type="date" id="startDate" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="endDate">End Date</label>
+                        <input type="date" id="endDate" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="category">Category</label>
+                    <select id="category" class="form-input">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Generate Report</button>
+                    <button type="button" class="btn btn-primary" style="margin-left: 1rem;" onclick="exportTableToCSV('reportTable', 'inventory-report')">Export to CSV</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Report Results</h2>
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3>Total Items</h3>
+                    <div class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Value</h3>
+                    <div class="stat-value">$0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Movements</h3>
+                    <div class="stat-value">0</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="text" class="form-input" placeholder="Search results..." onkeyup="searchTable('reportTable', this.value)">
+            </div>
+
+            <table class="table" id="reportTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(this.closest('table'), 0)">SKU</th>
+                        <th onclick="sortTable(this.closest('table'), 1)">Name</th>
+                        <th onclick="sortTable(this.closest('table'), 2)">Category</th>
+                        <th onclick="sortTable(this.closest('table'), 3)">Quantity</th>
+                        <th onclick="sortTable(this.closest('table'), 4)">Value</th>
+                        <th onclick="sortTable(this.closest('table'), 5)">Last Movement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Report data will be populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="js/common.js"></script>
+    <script>
+        window.onload = function() {
+            loadCategories();
+            setDefaultDates();
+        }
+
+        function loadCategories() {
+            const categorySelect = document.getElementById('category');
+            categorySelect.innerHTML = '<option value="">All Categories</option>';
+            
+            // localStorage मधून कॅटेगरी लोड करा
+            const savedCategories = localStorage.getItem('categories');
+            if (savedCategories) {
+                const categories = JSON.parse(savedCategories);
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.name;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                });
+            }
+        }
+
+        function setDefaultDates() {
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            document.getElementById('startDate').value = firstDayOfMonth.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+        }
+
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateReport();
+        });
+
+        function generateReport() {
+            const reportType = document.getElementById('reportType').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const category = document.getElementById('category').value;
+
+            // स्टॉक डेटा लोड करा
+            const stockData = JSON.parse(localStorage.getItem('stockData') || '{}');
+            const itemCodes = JSON.parse(localStorage.getItem('itemCodes') || '[]');
+            const stockInRecords = JSON.parse(localStorage.getItem('stockInRecords') || '[]');
+            const stockOutRecords = JSON.parse(localStorage.getItem('stockOutRecords') || '[]');
+
+            const tbody = document.querySelector('#reportTable tbody');
+            tbody.innerHTML = '';
+
+            let totalItems = 0;
+            let totalValue = 0;
+            let totalMovements = 0;
+
+            itemCodes.forEach(item => {
+                if (category && item.category !== category) return;
+
+                const currentStock = stockData[item.code] || 0;
+                const value = currentStock * 100; // डेमो व्हॅल्यू
+
+                // मूव्हमेंट्स काउंट करा
+                const movements = stockInRecords.filter(record => record.itemCode === item.code).length +
+                                stockOutRecords.filter(record => record.itemCode === item.code).length;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>${item.category}</td>
+                    <td>${currentStock}</td>
+                    <td>₹${value}</td>
+                    <td>${movements}</td>
+                `;
+                tbody.appendChild(row);
+
+                totalItems++;
+                totalValue += value;
+                totalMovements += movements;
+            });
+
+            // स्टॅटिस्टिक्स अपडेट करा
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues[0].textContent = totalItems;
+            statValues[1].textContent = `₹${totalValue}`;
+            statValues[2].textContent = totalMovements;
+        }
+
+        function searchTable(tableId, searchText) {
+            const table = document.getElementById(tableId);
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+
+                for (let j = 0; j < cells.length; j++) {
+                    const cell = cells[j];
+                    if (cell.textContent.toLowerCase().indexOf(searchText.toLowerCase()) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                row.style.display = found ? '' : 'none';
+            }
+        }
+
+        function sortTable(table, column) {
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const direction = table.dataset.sortDir === 'asc' ? -1 : 1;
+            
+            rows.sort((a, b) => {
+                const aValue = a.cells[column].textContent;
+                const bValue = b.cells[column].textContent;
+                return aValue.localeCompare(bValue) * direction;
+            });
+
+            table.dataset.sortDir = direction === 1 ? 'asc' : 'desc';
+            
+            const tbody = table.querySelector('tbody');
+            tbody.innerHTML = '';
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function exportTableToCSV(tableId, filename) {
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll('tr');
+            const csv = [];
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = [], cols = rows[i].querySelectorAll('td, th');
+                
+                for (let j = 0; j < cols.length; j++) {
+                    let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ');
+                    data = data.replace(/"/g, '""');
+                    row.push('"' + data + '"');
+                }
+                
+                csv.push(row.join(','));
+            }
+
+            const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
+            const downloadLink = document.createElement('a');
+            downloadLink.download = filename + '.csv';
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    </script>
+</body>
+</html>

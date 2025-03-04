@@ -1,0 +1,125 @@
+<!-- हेडर -->
+<nav class="navbar">
+    <div class="container">
+        <div class="logo-section">
+            <button class="menu-toggle" onclick="toggleSidePanel()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo">
+                <a href="dashboard.html">
+                    <img src="images/deadstock-logo.png" alt="DeadStock Logo">
+                    <h2 class="logo-3d">DeadStock</h2>
+                </a>
+            </div>
+        </div>
+        <div class="user-section">
+            <span class="user-name" id="navUserName">User Name</span>
+            <div class="profile-menu dropdown">
+                <a href="#" class="nav-link">
+                    <img id="navProfilePic" src="images/default-profile.png" alt="Profile" class="profile-pic-small">
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="profile.html"><i class="fas fa-user"></i> View Profile</a></li>
+                    <li><a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- साईड पॅनेल -->
+<div class="side-panel" id="sidePanel">
+    <div class="side-panel-menu">
+        <a href="dashboard.html" class="side-menu-item" id="dashboard-link">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="#" class="side-menu-item has-submenu" onclick="toggleSubmenu(this)">
+            <i class="fas fa-cog"></i> Master
+        </a>
+        <div class="side-submenu">
+            <a href="create-item.html" class="side-menu-item" id="create-item-link">
+                <i class="fas fa-plus"></i> Create Item
+            </a>
+            <a href="itemcode.html" class="side-menu-item" id="itemcode-link">
+                <i class="fas fa-barcode"></i> Item Codes
+            </a>
+            <a href="category.html" class="side-menu-item" id="category-link">
+                <i class="fas fa-tags"></i> Categories
+            </a>
+            <a href="department.html" class="side-menu-item" id="department-link">
+                <i class="fas fa-building"></i> Departments
+            </a>
+        </div>
+        <a href="#" class="side-menu-item has-submenu" onclick="toggleSubmenu(this)">
+            <i class="fas fa-box"></i> Stock
+        </a>
+        <div class="side-submenu">
+            <a href="stock-in.html" class="side-menu-item" id="stock-in-link">
+                <i class="fas fa-arrow-down"></i> Stock In
+            </a>
+            <a href="stock-out.html" class="side-menu-item" id="stock-out-link">
+                <i class="fas fa-arrow-up"></i> Stock Out
+            </a>
+            <a href="warehouse.html" class="side-menu-item" id="warehouse-link">
+                <i class="fas fa-warehouse"></i> Warehouse
+            </a>
+        </div>
+        <a href="report.html" class="side-menu-item" id="report-link">
+            <i class="fas fa-chart-bar"></i> Reports
+        </a>
+    </div>
+</div>
+
+<script>
+// साईड पॅनेल फंक्शन्स
+function toggleSidePanel() {
+    document.getElementById('sidePanel').classList.toggle('active');
+}
+
+function toggleSubmenu(element) {
+    element.classList.toggle('active');
+}
+
+// यूजर इन्फो अपडेट करा
+function updateUserInfo() {
+    const userData = JSON.parse(localStorage.getItem('userData')) || {
+        name: 'User Name',
+        profilePic: 'images/default-profile.png'
+    };
+    document.getElementById('navUserName').textContent = userData.name;
+    document.getElementById('navProfilePic').src = userData.profilePic;
+}
+
+// लॉगआउट फंक्शन
+function handleLogout() {
+    if(confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('userData');
+        window.location.href = 'index.html';
+    }
+}
+
+// अॅक्टिव्ह मेनू आयटम सेट करा
+function setActiveMenuItem() {
+    const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+    const menuItems = document.querySelectorAll('.side-menu-item');
+    
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+        if(item.getAttribute('href') === currentPage) {
+            item.classList.add('active');
+            // पॅरेंट सबमेनू ओपन करा
+            const parentSubmenu = item.closest('.side-submenu');
+            if(parentSubmenu) {
+                parentSubmenu.previousElementSibling.classList.add('active');
+                parentSubmenu.style.display = 'block';
+            }
+        }
+    });
+}
+
+// पेज लोड झाल्यावर
+window.onload = function() {
+    updateUserInfo();
+    setActiveMenuItem();
+}
+</script> 

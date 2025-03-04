@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - DeadStock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="dashboard.html">
+                    <h2>DeadStock</h2>
+                </a>
+            </div>
+            <ul class="nav-list">
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">Master</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="create-item.html">Create Item</a></li>
+                        <li><a href="itemcode.html">Item Codes</a></li>
+                        <li><a href="category.html">Categories</a></li>
+                        <li><a href="department.html">Departments</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">Stock</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="stock-in.html">Stock In</a></li>
+                        <li><a href="stock-out.html">Stock Out</a></li>
+                        <li><a href="warehouse.html">Warehouse</a></li>
+                    </ul>
+                </li>
+                <li><a href="report.html" class="nav-link">Reports</a></li>
+                <li class="profile-menu dropdown">
+                    <a href="#" class="nav-link">
+                        <img id="navProfilePic" src="images/default-profile.png" alt="Profile" class="profile-pic-small">
+                        <span id="navProfileName">User Name</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="profile.html">View Profile</a></li>
+                        <li><a href="#" onclick="handleLogout()">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="dashboard-content">
+            <div class="dashboard-header">
+                <h1>Dashboard</h1>
+                <div class="date-filter">
+                    <label for="dateRange">Date Range:</label>
+                    <select id="dateRange">
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Items</h3>
+                        <p class="stat-number">1,234</p>
+                        <p class="stat-change positive">+5.2% <i class="fas fa-arrow-up"></i></p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Stock In</h3>
+                        <p class="stat-number">456</p>
+                        <p class="stat-change positive">+2.8% <i class="fas fa-arrow-up"></i></p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Stock Out</h3>
+                        <p class="stat-number">289</p>
+                        <p class="stat-change negative">-1.4% <i class="fas fa-arrow-down"></i></p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-warehouse"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>In Stock</h3>
+                        <p class="stat-number">945</p>
+                        <p class="stat-change positive">+3.6% <i class="fas fa-arrow-up"></i></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Stock Movement</h3>
+                    <div class="chart-container">
+                        <!-- स्टॉक मूव्हमेंट चार्ट इथे येईल -->
+                        <div id="stockMovementChart"></div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Category Distribution</h3>
+                    <div class="chart-container">
+                        <!-- कॅटेगरी डिस्ट्रिब्यूशन चार्ट इथे येईल -->
+                        <div id="categoryDistributionChart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <h3>Recent Activity</h3>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p class="activity-title">Stock In - Laptops</p>
+                            <p class="activity-meta">Quantity: 10 | Date: 2024-01-15</p>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p class="activity-title">Stock Out - Office Chairs</p>
+                            <p class="activity-meta">Quantity: 5 | Date: 2024-01-14</p>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p class="activity-title">New Item Added - Printers</p>
+                            <p class="activity-meta">Category: Electronics | Date: 2024-01-13</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        .dashboard-content {
+            padding: 2rem 0;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .date-filter select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            background: #f8f9fa;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #007bff;
+        }
+
+        .stat-info h3 {
+            margin: 0;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .stat-number {
+            margin: 0.5rem 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .stat-change.positive {
+            color: #28a745;
+        }
+
+        .stat-change.negative {
+            color: #dc3545;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-card h3 {
+            margin: 0 0 1rem 0;
+        }
+
+        .chart-container {
+            height: 300px;
+            /* चार्ट स्टाईल्स इथे येतील */
+        }
+
+        .recent-activity {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+
+        .activity-icon {
+            background: #f8f9fa;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #007bff;
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-title {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .activity-meta {
+            margin: 0.25rem 0 0 0;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+    </style>
+
+    <script>
+        // डेट रेंज चेंज हँडलर
+        document.getElementById('dateRange').addEventListener('change', function() {
+            // डेट रेंज नुसार डेटा अपडेट करा
+            updateDashboardData(this.value);
+        });
+
+        function updateDashboardData(dateRange) {
+            // स्टॉक डेटा लोड करा
+            const stockData = JSON.parse(localStorage.getItem('stockData') || '{}');
+            const itemCodes = JSON.parse(localStorage.getItem('itemCodes') || '[]');
+            const stockInRecords = JSON.parse(localStorage.getItem('stockInRecords') || '[]');
+            const stockOutRecords = JSON.parse(localStorage.getItem('stockOutRecords') || '[]');
+
+            // स्टॅटिस्टिक्स अपडेट करा
+            const totalItems = itemCodes.length;
+            const stockInCount = stockInRecords.length;
+            const stockOutCount = stockOutRecords.length;
+            const inStockCount = Object.values(stockData).reduce((sum, qty) => sum + qty, 0);
+
+            // स्टॅटिस्टिक्स दाखवा
+            document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = totalItems;
+            document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = stockInCount;
+            document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = stockOutCount;
+            document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = inStockCount;
+
+            // रीसेंट अॅक्टिव्हिटी अपडेट करा
+            const activityList = document.querySelector('.activity-list');
+            activityList.innerHTML = '';
+
+            // सर्व रेकॉर्ड्स एकत्र करा आणि तारखेनुसार सॉर्ट करा
+            const allActivities = [
+                ...stockInRecords.map(record => ({
+                    type: 'Stock In',
+                    icon: 'arrow-down',
+                    title: `Stock In - ${record.itemName}`,
+                    meta: `Quantity: ${record.quantity} | Date: ${formatDate(record.dateTime)}`
+                })),
+                ...stockOutRecords.map(record => ({
+                    type: 'Stock Out',
+                    icon: 'arrow-up',
+                    title: `Stock Out - ${record.itemName}`,
+                    meta: `Quantity: ${record.quantity} | Department: ${record.department}`
+                }))
+            ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+
+            // रीसेंट अॅक्टिव्हिटी दाखवा
+            allActivities.forEach(activity => {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item';
+                activityItem.innerHTML = `
+                    <div class="activity-icon">
+                        <i class="fas fa-${activity.icon}"></i>
+                    </div>
+                    <div class="activity-details">
+                        <p class="activity-title">${activity.title}</p>
+                        <p class="activity-meta">${activity.meta}</p>
+                    </div>
+                `;
+                activityList.appendChild(activityItem);
+            });
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+
+        function handleLogout() {
+            if(confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // पेज लोड झाल्यावर
+        window.onload = function() {
+            // प्रोफाइल डेटा लोड करा
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            if (userData.name) {
+                document.getElementById('navProfileName').textContent = userData.name;
+            }
+            if (userData.profilePic) {
+                document.getElementById('navProfilePic').src = userData.profilePic;
+            }
+
+            // डॅशबोर्ड डेटा अपडेट करा
+            updateDashboardData('today');
+        }
+    </script>
+</body>
+</html>

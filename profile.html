@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - DeadStock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- नेव्हिगेशन बार -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="dashboard.html">
+                    <h2>DeadStock</h2>
+                </a>
+            </div>
+            <ul class="nav-list">
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">Master</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="create-item.html">Create Item</a></li>
+                        <li><a href="itemcode.html">Item Codes</a></li>
+                        <li><a href="category.html">Categories</a></li>
+                        <li><a href="department.html">Departments</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">Stock</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="stock-in.html">Stock In</a></li>
+                        <li><a href="stock-out.html">Stock Out</a></li>
+                        <li><a href="warehouse.html">Warehouse</a></li>
+                    </ul>
+                </li>
+                <li><a href="report.html" class="nav-link">Reports</a></li>
+                <li class="profile-menu dropdown">
+                    <a href="#" class="nav-link">
+                        <img id="headerProfilePic" src="images/default-profile.png" alt="Profile" class="profile-pic-small">
+                        <span id="headerProfileName">User Name</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="profile.html">View Profile</a></li>
+                        <li><a href="#" onclick="handleLogout()">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-pic-container">
+                    <img id="profilePic" src="images/default-profile.png" alt="Profile Picture" class="profile-pic">
+                    <div class="profile-pic-overlay">
+                        <label for="profilePicInput" class="change-pic-btn">
+                            <i class="fas fa-camera"></i>
+                            Change Picture
+                        </label>
+                        <input type="file" id="profilePicInput" accept="image/*" style="display: none;" onchange="handleProfilePicChange(event)">
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <h1 id="profileName">User Name</h1>
+                    <p id="profileDepartment">Department</p>
+                </div>
+            </div>
+
+            <div class="profile-details">
+                <form id="profileForm" onsubmit="return handleProfileUpdate(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="namePrefix">Title</label>
+                            <select id="namePrefix" required>
+                                <option value="">Select Title</option>
+                                <option value="Mr">Mr.</option>
+                                <option value="Mrs">Mrs.</option>
+                                <option value="Miss">Miss</option>
+                                <option value="Smt">Smt.</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" required placeholder="Enter your full name">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="department">Department</label>
+                            <select id="department" required>
+                                <option value="">Select Department</option>
+                                <!-- Will be populated from localStorage -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="designation">Designation</label>
+                            <input type="text" id="designation" required placeholder="Enter your designation">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="collegeName">College Name</label>
+                            <input type="text" id="collegeName" required placeholder="Enter college name">
+                        </div>
+                        <div class="form-group">
+                            <label for="hod">HOD</label>
+                            <select id="hod" required>
+                                <option value="">Select HOD</option>
+                                <!-- Will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea id="address" rows="3" required placeholder="Enter your complete address"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" required placeholder="Enter your phone number">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email ID</label>
+                            <input type="email" id="email" required placeholder="Enter your email address">
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="reset" class="btn btn-secondary">Reset Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        .profile-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-pic-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .profile-pic {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .profile-pic-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            padding: 0.5rem;
+            border-bottom-left-radius: 50%;
+            border-bottom-right-radius: 50%;
+            display: none;
+        }
+
+        .profile-pic-container:hover .profile-pic-overlay {
+            display: block;
+        }
+
+        .change-pic-btn {
+            color: white;
+            text-align: center;
+            display: block;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .change-pic-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .profile-info h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .profile-info p {
+            margin: 0.5rem 0 0 0;
+            color: #666;
+        }
+
+        .profile-details {
+            margin-top: 2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+
+    <script>
+        // Load profile data on page load
+        window.onload = function() {
+            loadProfileData();
+            loadDepartments();
+            loadHODs();
+        }
+
+        function loadProfileData() {
+            // Load profile data from localStorage
+            const profileData = localStorage.getItem('profileData');
+            if (profileData) {
+                const data = JSON.parse(profileData);
+                document.getElementById('namePrefix').value = data.namePrefix || '';
+                document.getElementById('fullName').value = data.fullName || '';
+                document.getElementById('department').value = data.department || '';
+                document.getElementById('designation').value = data.designation || '';
+                document.getElementById('collegeName').value = data.collegeName || '';
+                document.getElementById('hod').value = data.hod || '';
+                document.getElementById('address').value = data.address || '';
+                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('email').value = data.email || '';
+                
+                // Update header and profile display
+                document.getElementById('profileName').textContent = 
+                    (data.namePrefix ? data.namePrefix + '. ' : '') + (data.fullName || 'User Name');
+                document.getElementById('profileDepartment').textContent = 
+                    (data.designation ? data.designation + ' - ' : '') + (data.department || 'Department');
+                document.getElementById('headerProfileName').textContent = data.fullName || 'User Name';
+                
+                // Update profile pictures if exists
+                if (data.profilePic) {
+                    document.getElementById('profilePic').src = data.profilePic;
+                    document.getElementById('headerProfilePic').src = data.profilePic;
+                }
+            }
+        }
+
+        function loadDepartments() {
+            // Load departments from localStorage
+            const savedDepartments = localStorage.getItem('departments');
+            if (savedDepartments) {
+                const departments = JSON.parse(savedDepartments);
+                const select = document.getElementById('department');
+                
+                // Clear existing options except first one
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+                
+                // Add department options
+                departments.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept.name;
+                    option.textContent = dept.name;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        function loadHODs() {
+            // Load departments to get HODs
+            const savedDepartments = localStorage.getItem('departments');
+            if (savedDepartments) {
+                const departments = JSON.parse(savedDepartments);
+                const hodSelect = document.getElementById('hod');
+                
+                // Clear existing options except first one
+                while (hodSelect.options.length > 1) {
+                    hodSelect.remove(1);
+                }
+                
+                // Add HODs from departments
+                departments.forEach(dept => {
+                    if (dept.head) {
+                        const option = document.createElement('option');
+                        option.value = dept.head;
+                        option.textContent = dept.head + ' (' + dept.name + ')';
+                        hodSelect.appendChild(option);
+                    }
+                });
+            }
+        }
+
+        function handleProfilePicChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const profilePic = e.target.result;
+                    // Update profile picture display
+                    document.getElementById('profilePic').src = profilePic;
+                    document.getElementById('headerProfilePic').src = profilePic;
+                    
+                    // Save to localStorage
+                    const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+                    profileData.profilePic = profilePic;
+                    localStorage.setItem('profileData', JSON.stringify(profileData));
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleProfileUpdate(event) {
+            event.preventDefault();
+            
+            const profileData = {
+                namePrefix: document.getElementById('namePrefix').value,
+                fullName: document.getElementById('fullName').value,
+                department: document.getElementById('department').value,
+                designation: document.getElementById('designation').value,
+                collegeName: document.getElementById('collegeName').value,
+                hod: document.getElementById('hod').value,
+                address: document.getElementById('address').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                profilePic: document.getElementById('profilePic').src
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('profileData', JSON.stringify(profileData));
+            
+            // Update display
+            document.getElementById('profileName').textContent = 
+                (profileData.namePrefix ? profileData.namePrefix + '. ' : '') + profileData.fullName;
+            document.getElementById('profileDepartment').textContent = 
+                (profileData.designation ? profileData.designation + ' - ' : '') + profileData.department;
+            document.getElementById('headerProfileName').textContent = profileData.fullName;
+            
+            alert('Profile updated successfully!');
+            return false;
+        }
+
+        function handleLogout() {
+            if(confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html> 

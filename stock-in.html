@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock In - DeadStock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="dashboard.html">
+                    <h2>DeadStock</h2>
+                </a>
+            </div>
+            <ul class="nav-list">
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">Master</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="create-item.html">Create Item</a></li>
+                        <li><a href="itemcode.html">Item Codes</a></li>
+                        <li><a href="category.html">Categories</a></li>
+                        <li><a href="department.html">Departments</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">Stock</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="stock-in.html">Stock In</a></li>
+                        <li><a href="stock-out.html">Stock Out</a></li>
+                        <li><a href="warehouse.html">Warehouse</a></li>
+                    </ul>
+                </li>
+                <li><a href="report.html" class="nav-link">Reports</a></li>
+                <li class="profile-menu dropdown">
+                    <a href="#" class="nav-link">
+                        <img id="navProfilePic" src="images/default-profile.png" alt="Profile" class="profile-pic-small">
+                        <span id="navProfileName">User Name</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="profile.html">View Profile</a></li>
+                        <li><a href="#" onclick="handleLogout()">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="card">
+            <h1>Stock In Entry</h1>
+            
+            <form id="stockInForm" onsubmit="return handleStockIn(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="srNo">SR. No</label>
+                        <input type="text" id="srNo" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateTime">Date & Time</label>
+                        <input type="datetime-local" id="dateTime" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="itemCode">Item Code</label>
+                        <select id="itemCode" required onchange="updateItemDetails()">
+                            <option value="">Select Item Code</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemName">Item Name</label>
+                        <input type="text" id="itemName" readonly>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <input type="text" id="category" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="currentStock">Current Stock</label>
+                        <input type="text" id="currentStock" readonly>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="invoiceNumber">Invoice Number</label>
+                        <input type="text" id="invoiceNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" required min="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="comments">Comments</label>
+                    <textarea id="comments" rows="3" placeholder="Add any additional notes here..."></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Submit Stock In</button>
+                    <button type="reset" class="btn btn-secondary">Clear Form</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Stock In History</h2>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search stock in records..." onkeyup="searchRecords()">
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>SR. No</th>
+                            <th>Date & Time</th>
+                            <th>Item Name</th>
+                            <th>Invoice Number</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockInHistory">
+                        <!-- JavaScript द्वारे भरले जाईल -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- एडिट मोडल -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Edit Stock In Entry</h2>
+                <form id="editForm">
+                    <input type="hidden" id="editSrNo">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editDateTime">Date & Time</label>
+                            <input type="datetime-local" id="editDateTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editQuantity">Quantity</label>
+                            <input type="number" id="editQuantity" required min="1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editInvoiceNumber">Invoice Number</label>
+                        <input type="text" id="editInvoiceNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editComments">Comments</label>
+                        <textarea id="editComments" rows="3"></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .product-summary {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-item label {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .form-group input[readonly] {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        /* ड्रॉपडाउन स्टाईलिंग */
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: white;
+        }
+
+        optgroup {
+            font-weight: bold;
+            color: #666;
+        }
+
+        option {
+            padding: 0.5rem;
+        }
+
+        /* मोडल स्टाईल्स */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* टेबल स्टाईल्स */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+
+    <script src="js/common.js"></script>
+    <script>
+        // ऑटो SR.No जनरेट करण्यासाठी
+        let currentSrNo = 1;
+
+        function formatDateTime(dateTimeString) {
+            const date = new Date(dateTimeString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            
+            return `${day}-${month}-${year} ${hours}:${minutes}`;
+        }
+
+        window.onload = function() {
+            // SR.No सेट करा
+            document.getElementById('srNo').value = generateSrNo();
+            
+            // डिफॉल्ट तारीख आणि वेळ सेट करा
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('dateTime').value = now.toISOString().slice(0, 16);
+            
+            // आयटम कोड्स लोड करा
+            loadItemCodes();
+            loadStockInHistory(); // हिस्टरी लोड करा
+        }
+
+        function generateSrNo() {
+            // SR.No फॉरमॅट: SI2024000001
+            return `SI${new Date().getFullYear()}${String(currentSrNo).padStart(6, '0')}`;
+        }
+
+        function handleStockIn(event) {
+            event.preventDefault();
+            
+            const itemCode = document.getElementById('itemCode').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            // स्टॉक डेटा अपडेट करा
+            let stockData = JSON.parse(localStorage.getItem('stockData') || '{}');
+            stockData[itemCode] = (stockData[itemCode] || 0) + quantity;
+            localStorage.setItem('stockData', JSON.stringify(stockData));
+            
+            // फॉर्म डेटा कलेक्ट करा
+            const formData = {
+                srNo: document.getElementById('srNo').value,
+                dateTime: document.getElementById('dateTime').value,
+                itemCode: itemCode,
+                itemName: document.getElementById('itemName').value,
+                category: document.getElementById('category').value,
+                invoiceNumber: document.getElementById('invoiceNumber').value,
+                quantity: quantity,
+                comments: document.getElementById('comments').value,
+                status: 'Completed'
+            };
+
+            // स्टॉक इन हिस्टरी अपडेट करा
+            let stockInRecords = JSON.parse(localStorage.getItem('stockInRecords') || '[]');
+            stockInRecords.unshift(formData); // नवीन रेकॉर्ड सुरुवातीला जोडा
+            localStorage.setItem('stockInRecords', JSON.stringify(stockInRecords));
+            
+            // हिस्टरी टेबल अपडेट करा
+            loadStockInHistory();
+            
+            // फॉर्म रीसेट करा
+            document.getElementById('stockInForm').reset();
+            generateSrNo();
+            setCurrentDateTime();
+            loadItemCodes();
+            
+            alert('Stock in entry has been recorded successfully!');
+            return false;
+        }
+
+        function handleLogout() {
+            if(confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function loadItemCodes() {
+            const savedCodes = localStorage.getItem('itemCodes');
+            if (savedCodes) {
+                const itemCodes = JSON.parse(savedCodes);
+                const select = document.getElementById('itemCode');
+                select.innerHTML = '<option value="">Select Item Code</option>';
+                
+                itemCodes.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.code;
+                    option.textContent = `${item.code} - ${item.name}`;
+                    option.dataset.name = item.name;
+                    option.dataset.category = item.category;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        function updateItemDetails() {
+            const select = document.getElementById('itemCode');
+            const selectedOption = select.options[select.selectedIndex];
+
+            if (selectedOption.value) {
+                document.getElementById('itemName').value = selectedOption.dataset.name;
+                document.getElementById('category').value = selectedOption.dataset.category;
+                
+                // स्टॉक डेटा localStorage मधून घ्या
+                const stockData = localStorage.getItem('stockData');
+                let currentStock = 0;
+                
+                if (stockData) {
+                    const stocks = JSON.parse(stockData);
+                    const itemStock = stocks[selectedOption.value];
+                    if (itemStock) {
+                        currentStock = itemStock;
+                    }
+                }
+                
+                document.getElementById('currentStock').value = currentStock;
+            } else {
+                document.getElementById('itemName').value = '';
+                document.getElementById('category').value = '';
+                document.getElementById('currentStock').value = '';
+            }
+        }
+
+        function loadStockInHistory() {
+            const savedRecords = JSON.parse(localStorage.getItem('stockInRecords') || '[]');
+            const tbody = document.getElementById('stockInHistory');
+            tbody.innerHTML = '';
+
+            savedRecords.forEach((record, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.srNo}</td>
+                    <td>${formatDateTime(record.dateTime)}</td>
+                    <td>${record.itemName}</td>
+                    <td>${record.invoiceNumber}</td>
+                    <td>${record.quantity}</td>
+                    <td><span class="badge ${record.status.toLowerCase()}">${record.status}</span></td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-edit" onclick="editRecord(${index})">Edit</button>
+                        <button class="btn btn-sm btn-delete" onclick="deleteRecord(${index})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function editRecord(index) {
+            const stockInRecords = JSON.parse(localStorage.getItem('stockInRecords') || '[]');
+            const record = stockInRecords[index];
+            
+            if (record) {
+                document.getElementById('editSrNo').value = index;
+                document.getElementById('editDateTime').value = record.dateTime;
+                document.getElementById('editQuantity').value = record.quantity;
+                document.getElementById('editInvoiceNumber').value = record.invoiceNumber;
+                document.getElementById('editComments').value = record.comments || '';
+                
+                document.getElementById('editModal').style.display = 'block';
+            }
+        }
+
+        function deleteRecord(index) {
+            const stockInRecords = JSON.parse(localStorage.getItem('stockInRecords') || '[]');
+            const record = stockInRecords[index];
+            
+            if (record && confirm('Are you sure you want to delete this record?')) {
+                // स्टॉक डेटा अपडेट करा
+                let stockData = JSON.parse(localStorage.getItem('stockData') || '{}');
+                stockData[record.itemCode] = (stockData[record.itemCode] || 0) - record.quantity;
+                localStorage.setItem('stockData', JSON.stringify(stockData));
+                
+                // रेकॉर्ड डिलीट करा
+                stockInRecords.splice(index, 1);
+                localStorage.setItem('stockInRecords', JSON.stringify(stockInRecords));
+                
+                // हिस्टरी अपडेट करा
+                loadStockInHistory();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // मोडल बंद करण्यासाठी क्लोज बटन
+        document.querySelector('.close').onclick = closeModal;
+
+        // मोडलच्या बाहेर क्लिक केल्यावर बंद करा
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('editModal')) {
+                closeModal();
+            }
+        }
+
+        function searchRecords() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.getElementById('stockInHistory').getElementsByTagName('tr');
+
+            for (let row of rows) {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>

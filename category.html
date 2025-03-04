@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - DeadStock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="dashboard.html">
+                    <h2>DeadStock</h2>
+                </a>
+            </div>
+            <ul class="nav-list">
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">Master</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="create-item.html">Create Item</a></li>
+                        <li><a href="itemcode.html">Item Codes</a></li>
+                        <li><a href="category.html">Categories</a></li>
+                        <li><a href="department.html">Departments</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">Stock</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="stock-in.html">Stock In</a></li>
+                        <li><a href="stock-out.html">Stock Out</a></li>
+                        <li><a href="warehouse.html">Warehouse</a></li>
+                    </ul>
+                </li>
+                <li><a href="report.html" class="nav-link">Reports</a></li>
+                <li class="profile-menu dropdown">
+                    <a href="#" class="nav-link">
+                        <img id="navProfilePic" src="images/default-profile.png" alt="Profile" class="profile-pic-small">
+                        <span id="navProfileName">User Name</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="profile.html">View Profile</a></li>
+                        <li><a href="#" onclick="handleLogout()">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="card">
+            <h1>Category Management</h1>
+            
+            <!-- कॅटेगरी मॅनेजमेंट बटन्स -->
+            <div class="management-buttons">
+                <button class="btn btn-primary" onclick="showAddForm()">Add New Category</button>
+                <button class="btn btn-secondary" onclick="showListView()">View Categories</button>
+            </div>
+
+            <!-- नवीन कॅटेगरी जोडण्यासाठी फॉर्म -->
+            <div class="form-section" id="addCategoryForm" style="display: none;">
+                <h2>Add New Category</h2>
+                <form id="categoryForm" onsubmit="return handleAddCategory(event)">
+                    <div class="form-group">
+                        <label for="categoryName">Category Name</label>
+                        <input type="text" id="categoryName" required placeholder="Enter category name">
+                    </div>
+                    <div class="form-group">
+                        <label for="categoryDescription">Description</label>
+                        <textarea id="categoryDescription" rows="3" placeholder="Enter category description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="parentCategory">Parent Category (Optional)</label>
+                        <select id="parentCategory">
+                            <option value="">None</option>
+                            <!-- JavaScript द्वारे भरले जाईल -->
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Category</button>
+                </form>
+            </div>
+
+            <!-- एडिट कॅटेगरी फॉर्म -->
+            <div class="form-section" id="editCategoryForm" style="display: none;">
+                <h2>Edit Category</h2>
+                <form onsubmit="return handleEditCategory(event)">
+                    <input type="hidden" id="editCategoryId">
+                    <div class="form-group">
+                        <label for="editCategoryName">Category Name</label>
+                        <input type="text" id="editCategoryName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCategoryDescription">Description</label>
+                        <textarea id="editCategoryDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editParentCategory">Parent Category (Optional)</label>
+                        <select id="editParentCategory">
+                            <option value="">None</option>
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Update Category</button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- कॅटेगरीज ची यादी -->
+            <div class="list-section" id="categoryList">
+                <h2>Category List</h2>
+                <div class="search-bar">
+                    <input type="text" id="searchCategory" placeholder="Search categories..." onkeyup="searchCategories()">
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Category Name</th>
+                            <th>Description</th>
+                            <th>Parent Category</th>
+                            <th>Items Count</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoriesTableBody">
+                        <!-- डेमो डेटा -->
+                        <tr>
+                            <td>Electronics</td>
+                            <td>Electronic items and gadgets</td>
+                            <td>None</td>
+                            <td>5</td>
+                            <td>
+                                <button class="btn-action btn-edit" onclick="editCategory('1', 'Electronics', 'Electronic items and gadgets', '')">Edit</button>
+                                <button class="btn-action btn-delete" onclick="deleteCategory('1', 'Electronics')">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        .form-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .list-section {
+            margin-top: 2rem;
+        }
+
+        .search-bar {
+            margin-bottom: 1rem;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .btn-action {
+            padding: 0.25rem 0.5rem;
+            margin: 0 0.25rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            border: none;
+            color: black;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            border: none;
+            color: white;
+        }
+
+        .management-buttons {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+    </style>
+
+    <script src="js/common.js"></script>
+    <script>
+        // कॅटेगरी डेटा स्टोअर करण्यासाठी अॅरे
+        let categories = [];
+
+        // पेज लोड झाल्यावर कॅटेगरीज लोड करा
+        window.onload = function() {
+            loadCategories();
+            showListView(); // डिफॉल्ट व्ह्यू म्हणून लिस्ट दाखवा
+            
+            // पॅरेंट कॅटेगरी ड्रॉपडाउन अपडेट करा
+            loadCategoryDropdown('parentCategory');
+            loadCategoryDropdown('editParentCategory');
+        }
+
+        // फॉर्म दाखवा
+        function showAddForm() {
+            document.getElementById('addCategoryForm').style.display = 'block';
+            document.getElementById('editCategoryForm').style.display = 'none';
+            document.getElementById('categoryList').style.display = 'none';
+        }
+
+        // लिस्ट दाखवा
+        function showListView() {
+            document.getElementById('addCategoryForm').style.display = 'none';
+            document.getElementById('editCategoryForm').style.display = 'none';
+            document.getElementById('categoryList').style.display = 'block';
+        }
+
+        // एडिट फॉर्म दाखवा
+        function showEditForm() {
+            document.getElementById('addCategoryForm').style.display = 'none';
+            document.getElementById('editCategoryForm').style.display = 'block';
+            document.getElementById('categoryList').style.display = 'none';
+        }
+
+        // localStorage मधून कॅटेगरीज लोड करा
+        function loadCategories() {
+            const savedCategories = localStorage.getItem('categories');
+            if (savedCategories) {
+                categories = JSON.parse(savedCategories);
+                updateCategoryList();
+            }
+        }
+
+        // कॅटेगरीज सेव्ह करा
+        function saveCategories() {
+            localStorage.setItem('categories', JSON.stringify(categories));
+            
+            // सर्व ड्रॉपडाउन्स अपडेट करा
+            loadCategoryDropdown('parentCategory');
+            loadCategoryDropdown('editParentCategory');
+        }
+
+        // नवीन कॅटेगरी जोडा
+        function handleAddCategory(event) {
+            event.preventDefault();
+            
+            const category = {
+                id: Date.now(),
+                name: document.getElementById('categoryName').value,
+                description: document.getElementById('categoryDescription').value,
+                parentCategory: document.getElementById('parentCategory').value
+            };
+
+            categories.push(category);
+            saveCategories();
+            updateCategoryList();
+            event.target.reset();
+            showListView();
+            
+            alert('Category added successfully!');
+            return false;
+        }
+
+        // कॅटेगरी एडिट करा
+        function handleEditCategory(event) {
+            event.preventDefault();
+            
+            const categoryId = document.getElementById('editCategoryId').value;
+            const index = categories.findIndex(cat => cat.id === parseInt(categoryId));
+            
+            if (index !== -1) {
+                categories[index] = {
+                    id: parseInt(categoryId),
+                    name: document.getElementById('editCategoryName').value,
+                    description: document.getElementById('editCategoryDescription').value,
+                    parentCategory: document.getElementById('editParentCategory').value
+                };
+                
+                saveCategories();
+                updateCategoryList();
+                showListView();
+                alert('Category updated successfully!');
+            }
+            
+            return false;
+        }
+
+        // एडिट रद्द करा
+        function cancelEdit() {
+            showListView();
+        }
+
+        function updateCategoryList() {
+            const tbody = document.getElementById('categoriesTableBody');
+            tbody.innerHTML = categories.map(cat => `
+                <tr>
+                    <td>${cat.name}</td>
+                    <td>${cat.description || ''}</td>
+                    <td>${cat.parentCategory || 'None'}</td>
+                    <td>0</td>
+                    <td>
+                        <button class="btn-action btn-edit" onclick="editCategory('${cat.id}')">Edit</button>
+                        <button class="btn-action btn-delete" onclick="deleteCategory('${cat.id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function editCategory(categoryId) {
+            const category = categories.find(cat => cat.id === parseInt(categoryId));
+            if (category) {
+                document.getElementById('editCategoryId').value = category.id;
+                document.getElementById('editCategoryName').value = category.name;
+                document.getElementById('editCategoryDescription').value = category.description || '';
+                document.getElementById('editParentCategory').value = category.parentCategory || '';
+                showEditForm();
+            }
+        }
+
+        function deleteCategory(categoryId) {
+            if (confirm('Are you sure you want to delete this category?')) {
+                const index = categories.findIndex(cat => cat.id === parseInt(categoryId));
+                if (index !== -1) {
+                    categories.splice(index, 1);
+                    saveCategories();
+                    updateCategoryList();
+                    alert('Category deleted successfully!');
+                }
+            }
+        }
+
+        // कॅटेगरी सर्च
+        function searchCategories() {
+            const searchText = document.getElementById('searchCategory').value.toLowerCase();
+            const tbody = document.getElementById('categoriesTableBody');
+            
+            tbody.innerHTML = categories
+                .filter(cat => 
+                    cat.name.toLowerCase().includes(searchText) || 
+                    (cat.description && cat.description.toLowerCase().includes(searchText))
+                )
+                .map(cat => `
+                    <tr>
+                        <td>${cat.name}</td>
+                        <td>${cat.description || ''}</td>
+                        <td>${cat.parentCategory || 'None'}</td>
+                        <td>0</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="editCategory('${cat.id}')">Edit</button>
+                            <button class="btn-action btn-delete" onclick="deleteCategory('${cat.id}')">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+        }
+
+        function handleLogout() {
+            if(confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html> 
